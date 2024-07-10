@@ -1,6 +1,6 @@
 import sqlite3
 from models import Sport, Event, Selection
-from typing import Optional
+from utils import as_value
 
 DATABASE = 'spectate_api.db'
 
@@ -57,10 +57,10 @@ def create_tables():
 create_tables()
 
 
-def db_get_sports():
+def db_get_all_entries(table_name: str):
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM sports")
+    cursor.execute("SELECT * FROM {}".format(table_name))
     return cursor.fetchall()
 
 
@@ -75,41 +75,30 @@ def db_add_sport(sport: Sport):
     return cursor.lastrowid
 
 
-# Needs to be cleaned up, possibly iterate through input params rather than multiple ifs
-# The use of optionals allows for using PATCH request. Did not work without optionals and using single sql update
-def db_update_sport(sport_id: int, name: Optional[str], slug: Optional[str], active: Optional[bool]):
+# Update method to take in all sql update values as parameters to work generically for sports, events and selections
+def db_update(table_name: str, entity_id: int, **kwargs):
     connection = get_db()
     cursor = connection.cursor()
-    if name:
-        cursor.execute("UPDATE sports SET name = ? WHERE id = ?", (name, sport_id))
-    if slug:
-        cursor.execute("UPDATE sports SET slug = ? WHERE id = ?", (slug, sport_id))
-    if active is not None:
-        cursor.execute("UPDATE sports SET active = ? WHERE id = ?", (active, sport_id))
-    connection.commit()
+    for key, value in kwargs.items():
+        cursor.execute("UPDATE {} SET {} = {} WHERE id = {}".format(
+            table_name, key, as_value(value), entity_id))
+        connection.commit()
     return cursor.rowcount
 
 
-# Does not work for multiple queries yet
-def db_search_sports(name: Optional[str], slug: Optional[str]):
-    conn = get_db()
-    cursor = conn.cursor()
-    query = "SELECT * FROM sports WHERE 1=1"
-    params = []
-    if name:
-        query += " AND name LIKE ?"
-        params.append(f'%{name}%')
-    if slug:
-        query += " AND slug LIKE ?"
-        params.append(f'%{slug}%')
-    cursor.execute(query, params)
-    return cursor.fetchall()
-
-
-def db_get_events():
+# Probably still doesn't work for multiple queries at once
+def db_search(table_name: str, **kwargs):
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM events")
+    for key, value in kwargs.items():
+        query = "SELECT * FROM {} WHERE 1=1 {}".format(
+            table_name,
+            "".join([
+                f" AND {key} LIKE {as_value(value, wildcard=True)}"
+            ])
+        )
+        print(query)
+        cursor.execute(query)
     return cursor.fetchall()
 
 
@@ -126,17 +115,6 @@ def db_add_event(event: Event):
     return cursor.lastrowid
 
 
-def db_update_event(event: Event):
-    return
-
-
-def db_get_selections():
-    connection = get_db()
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM selections")
-    return cursor.fetchall()
-
-
 def db_add_selection(selection: Selection):
     connection = get_db()
     cursor = connection.cursor()
@@ -147,7 +125,3 @@ def db_add_selection(selection: Selection):
     )
     connection.commit()
     return cursor.lastrowid
-
-
-def db_update_selection(selection: Selection):
-    return
