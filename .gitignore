@@ -2,3 +2,4 @@
 .venv/
 .idea/
 __pycache__/
+spectate_api.db
