@@ -1,4 +1,6 @@
 import sqlite3
+from functools import cache
+
 from models import Sport, Event, Selection
 from utils import as_value
 
@@ -31,12 +33,12 @@ def create_tables():
                 slug TEXT UNIQUE NOT NULL,
                 active BOOLEAN NOT NULL,
                 type TEXT NOT NULL,
-                sport_id INTEGER NOT NULL,
+                sport INTEGER NOT NULL,
                 status TEXT NOT NULL,
                 scheduled_start TEXT NOT NULL,
                 actual_start TEXT,
                 logos TEXT,
-                FOREIGN KEY (sport_id) REFERENCES sports (id)
+                FOREIGN KEY (sport) REFERENCES sports (id)
             )
         ''')
 
@@ -44,11 +46,11 @@ def create_tables():
             CREATE TABLE IF NOT EXISTS selections (
                 id INTEGER PRIMARY KEY,
                 name TEXT NOT NULL,
-                event_id INTEGER NOT NULL,
+                event INTEGER NOT NULL,
                 price REAL NOT NULL,
                 active BOOLEAN NOT NULL,
                 outcome TEXT NOT NULL,
-                FOREIGN KEY (event_id) REFERENCES events (id)
+                FOREIGN KEY (event) REFERENCES events (id)
             )
         ''')
         connection.commit()
@@ -80,13 +82,16 @@ def db_update(table_name: str, entity_id: int, **kwargs):
     connection = get_db()
     cursor = connection.cursor()
     for key, value in kwargs.items():
-        cursor.execute("UPDATE {} SET {} = {} WHERE id = {}".format(
-            table_name, key, as_value(value), entity_id))
+        query = "UPDATE {} SET {} = {} WHERE id = {}".format(
+            table_name, key, as_value(value), entity_id)
+        print(query)
+        cursor.execute(query)
         connection.commit()
     return cursor.rowcount
 
 
 # Probably still doesn't work for multiple queries at once
+@cache
 def db_search(table_name: str, **kwargs):
     connection = get_db()
     cursor = connection.cursor()
@@ -106,7 +111,7 @@ def db_add_event(event: Event):
     connection = get_db()
     cursor = connection.cursor()
     cursor.execute(
-        '''INSERT INTO events (name, slug, active, type, sport_id, status, scheduled_start, actual_start, logos)
+        '''INSERT INTO events (name, slug, active, type, sport, status, scheduled_start, actual_start, logos)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         (event.Name, event.Slug, event.Active, event.Type.value, event.Sport, event.Status.value,
          event.ScheduledStart.isoformat(), event.ActualStart.isoformat() if event.ActualStart else None, event.Logos)
@@ -119,7 +124,7 @@ def db_add_selection(selection: Selection):
     connection = get_db()
     cursor = connection.cursor()
     cursor.execute(
-        '''INSERT INTO selections (name, event_id, price, active, outcome)
+        '''INSERT INTO selections (name, event, price, active, outcome)
            VALUES (?, ?, ?, ?, ?)''',
         (selection.Name, selection.Event, float(selection.Price), selection.Active, selection.Outcome.value)
     )
