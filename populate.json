@@ -1,0 +1,80 @@
+{
+  "sports": [
+    {
+        "Name": "Football"
+    },
+    {
+        "Name": "Basketball"
+    },
+    {
+        "Name": "Snow Boarding"
+    }
+  ],
+  "events": [
+    {
+        "Name": "Chelsea vs Arsenal",
+        "Type": "PREPLAY",
+        "Sport": "1",
+        "Status": "PENDING",
+        "ScheduledStart": "2024-07-10T15:00:00"
+    },
+    {
+        "Name": "Liverpool vs Leeds",
+        "Type": "INPLAY",
+        "Sport": "1",
+        "Status": "STARTED",
+        "ScheduledStart": "2024-07-10T15:00:00"
+    },
+    {
+        "Name": "Arsenal vs Liverpool",
+        "Type": "INPLAY",
+        "Sport": "1",
+        "Status": "STARTED",
+        "ScheduledStart": "2024-07-10T15:00:00"
+    },
+    {
+        "Name": "Lakers vs Eagles",
+        "Type": "INPLAY",
+        "Sport": "2",
+        "Status": "CANCELLED",
+        "ScheduledStart": "2024-07-10T15:00:00"
+    },
+    {
+        "Name": "McMorris vs Helgason",
+        "Type": "PREPLAY",
+        "Sport": "3",
+        "Status": "PENDING",
+        "ScheduledStart": "2024-07-10T15:00:00"
+    },
+    {
+        "Name": "Kleveland vs Powell",
+        "Type": "INPLAY",
+        "Sport": "3",
+        "Status": "STARTED",
+        "ScheduledStart": "2024-07-10T15:00:00"
+    }
+  ],
+  "selections": [
+    {
+        "Name": "Match Bet",
+        "Event": 1,
+        "Price": 35.48,
+        "Active": 0,
+        "Outcome": "LOSE"
+    },
+    {
+        "Name": "Match Bet Winner",
+        "Event": 1,
+        "Price": 45.60,
+        "Active": 0,
+        "Outcome": "WIN"
+    },
+    {
+        "Name": "X Games",
+        "Event": 5,
+        "Price": 87.55,
+        "Active": 0,
+        "Outcome": "UNSETTLED"
+    }
+  ]
+}

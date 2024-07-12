@@ -1,4 +1,4 @@
-from sanic import Blueprint, response
+from sanic import Blueprint
 from sanic.request import Request
 from db import db_get_all_entries, db_add_sport, db_update, db_search
 from models import Sport

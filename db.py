@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from functools import cache
 
@@ -59,6 +60,13 @@ def create_tables():
 create_tables()
 
 
+def db_drop_table(table_name: str):
+    connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute("DROP TABLE IF EXISTS {};".format(table_name))
+    return cursor.fetchall()
+
+
 def db_get_all_entries(table_name: str):
     connection = get_db()
     cursor = connection.cursor()
@@ -84,7 +92,6 @@ def db_update(table_name: str, entity_id: int, **kwargs):
     for key, value in kwargs.items():
         query = "UPDATE {} SET {} = {} WHERE id = {}".format(
             table_name, key, as_value(value), entity_id)
-        print(query)
         cursor.execute(query)
         connection.commit()
     return cursor.rowcount
@@ -102,7 +109,6 @@ def db_search(table_name: str, **kwargs):
                 f" AND {key} LIKE {as_value(value, wildcard=True)}"
             ])
         )
-        print(query)
         cursor.execute(query)
     return cursor.fetchall()
 

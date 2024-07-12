@@ -1,0 +1,19 @@
+ services:
+  sqlite3:
+    image: nouchka/sqlite3:latest
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./db/:/root/db/
+  app:
+    build:
+      context: ../
+      dockerfile: /Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../:/app
+      - ./app/spectate_api.db:/app/spectate_api.db
+    command: pipenv run gunicorn --bind=0.0.0.0:8000 --reload app:app
+    environment:
+      - DATABASE=/app/spectate_api.db
