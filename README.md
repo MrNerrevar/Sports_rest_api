@@ -1,4 +1,4 @@
-# Spectate REST API
+Test REST API
 
 This is a simple REST API built with Python and Sanic that manages multiple sports, events, and selections.
 
